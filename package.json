@@ -1,7 +1,7 @@
 {
   "name": "palknobs",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Local desktop app for editing Palworld dedicated server settings (PalWorldSettings.ini) through a friendly UI.",
   "author": "Jason Rundell",
   "license": "MIT",
@@ -81,8 +81,7 @@
       "target": [
         "nsis"
       ],
-      "icon": "build/icon.png",
-      "signAndEditExecutable": false
+      "icon": "build/icon.png"
     },
     "nsis": {
       "oneClick": false,

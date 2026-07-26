@@ -39,5 +39,8 @@ jobs:
             release/*.exe
             release/*.exe.blockmap
           generate_release_notes: true
+          # Publish as a hidden draft so the maintainer can test the built
+          # installer before making it public. Flip to false for auto-publish.
+          draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
