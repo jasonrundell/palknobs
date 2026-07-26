@@ -58,6 +58,75 @@ select {
   font: inherit;
 }
 
+.update-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  margin-bottom: 18px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #f4fbf7;
+  box-shadow: var(--shadow);
+}
+
+.update-banner__icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.update-banner__text {
+  font-weight: 500;
+}
+
+.update-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.update-banner__link {
+  color: #f4fbf7;
+  text-decoration: underline;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.update-banner__skip {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: transparent;
+  color: #f4fbf7;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.update-banner__skip:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.update-banner__skip:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.update-banner__dismiss {
+  border: none;
+  background: transparent;
+  color: #f4fbf7;
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.update-banner__dismiss:hover {
+  opacity: 1;
+}
+
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.85em;

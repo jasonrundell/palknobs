@@ -16,6 +16,8 @@ import {
   setSettingsPath,
 } from './paths.js'
 import { CATEGORIES, SETTINGS_META } from './settingsMeta.js'
+import { setSkippedVersion } from './configStore.js'
+import { getUpdateStatus } from './updateCheck.js'
 
 export function createApp(staticDir?: string) {
   const app = express()
@@ -109,6 +111,27 @@ export function createApp(staticDir?: string) {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       console.error('[settings:put]', message)
+      res.status(400).json({ error: message })
+    }
+  })
+
+  app.get('/api/update', async (_req, res) => {
+    // getUpdateStatus never throws; errors are reported in the payload.
+    res.json(await getUpdateStatus())
+  })
+
+  app.post('/api/update/skip', async (req, res) => {
+    try {
+      const version = req.body?.version
+      if (typeof version !== 'string' || !version.trim()) {
+        throw new Error('Request body must include a version to skip.')
+      }
+      await setSkippedVersion(version.trim().replace(/^v/i, ''))
+      // Recompute so the response reflects the new suppression immediately.
+      res.json(await getUpdateStatus(true))
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error('[update:skip]', message)
       res.status(400).json({ error: message })
     }
   })

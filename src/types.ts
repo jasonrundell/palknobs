@@ -42,3 +42,12 @@ export interface MetaResponse {
   settings: SettingMeta[]
   paths: PathsInfo
 }
+
+export interface UpdateStatus {
+  currentVersion: string
+  latestVersion: string | null
+  updateAvailable: boolean
+  releaseUrl: string | null
+  checkedAt: string
+  error?: string
+}

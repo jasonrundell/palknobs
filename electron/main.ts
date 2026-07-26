@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron'
 import path from 'node:path'
 import type { StartedServer } from '../server/start.js'
 import { startApiServer } from '../server/start.js'
@@ -37,6 +37,8 @@ function registerIpcHandlers(): void {
 
 async function createWindow(): Promise<void> {
   process.env.PALSERVER_MANAGER_CONFIG_DIR = app.getPath('userData')
+  // Give the embedded API a reliable version for the update check.
+  process.env.PALKNOBS_VERSION = app.getVersion()
   registerIpcHandlers()
 
   if (useViteDevServer) {
@@ -74,6 +76,15 @@ async function createWindow(): Promise<void> {
     })
     await mainWindow.loadURL(`http://localhost:${apiServer.port}`)
   }
+
+  // Open external links (e.g. the update banner's "View release") in the
+  // user's real browser instead of a new Electron window.
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('http:') || url.startsWith('https:')) {
+      void shell.openExternal(url)
+    }
+    return { action: 'deny' }
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null

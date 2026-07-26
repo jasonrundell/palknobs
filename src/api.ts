@@ -4,6 +4,7 @@ import type {
   OptionSettings,
   PathsInfo,
   SettingsResponse,
+  UpdateStatus,
 } from './types'
 
 async function parseJson<T>(response: Response): Promise<T> {
@@ -44,6 +45,18 @@ export function resetSettingsPath(): Promise<PathsInfo> {
   return fetch('/api/paths', { method: 'DELETE' }).then((res) =>
     parseJson<PathsInfo>(res),
   )
+}
+
+export function fetchUpdateStatus(): Promise<UpdateStatus> {
+  return fetch('/api/update').then((res) => parseJson<UpdateStatus>(res))
+}
+
+export function skipUpdateVersion(version: string): Promise<UpdateStatus> {
+  return fetch('/api/update/skip', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version }),
+  }).then((res) => parseJson<UpdateStatus>(res))
 }
 
 export function valuesEqual(a: IniValue, b: IniValue): boolean {

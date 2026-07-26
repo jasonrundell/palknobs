@@ -1,0 +1,43 @@
+name: Release
+
+# Push a version tag (e.g. v1.0.0) to build the Windows installer and attach it
+# to a GitHub Release with auto-generated notes.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Builds the UI, compiles the Electron main process, and produces the NSIS
+      # installer in release/. No GITHUB_TOKEN is exposed here on purpose, so
+      # electron-builder does not try to publish — the release step below does.
+      - name: Build Windows installer
+        run: npm run electron:build
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.exe
+            release/*.exe.blockmap
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

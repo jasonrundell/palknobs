@@ -4,6 +4,8 @@ import path from 'node:path'
 
 export interface AppConfig {
   settingsPath?: string
+  /** Version the user chose to "skip" in the update notifier. */
+  skippedVersion?: string
 }
 
 let cached: AppConfig | null = null
@@ -44,6 +46,14 @@ export async function saveConfig(update: Partial<AppConfig>): Promise<AppConfig>
   await fs.writeFile(getConfigPath(), `${JSON.stringify(next, null, 2)}\n`, 'utf8')
   cached = next
   return next
+}
+
+export async function getSkippedVersion(): Promise<string | undefined> {
+  return (await loadConfig()).skippedVersion
+}
+
+export async function setSkippedVersion(version: string): Promise<AppConfig> {
+  return saveConfig({ skippedVersion: version })
 }
 
 export async function clearPersistedSettingsPath(): Promise<AppConfig> {

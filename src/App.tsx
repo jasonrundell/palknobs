@@ -2,17 +2,21 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   fetchMeta,
   fetchSettings,
+  fetchUpdateStatus,
   resetSettingsPath,
   saveSettings,
+  skipUpdateVersion,
   updateSettingsPath,
   valuesEqual,
 } from './api'
 import { SettingField } from './components/SettingField'
+import { UpdateBanner } from './components/UpdateBanner'
 import type {
   IniValue,
   MetaResponse,
   OptionSettings,
   SettingsResponse,
+  UpdateStatus,
 } from './types'
 
 type Status =
@@ -34,6 +38,9 @@ export default function App() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
   const [status, setStatus] = useState<Status>({ kind: 'loading' })
+  const [update, setUpdate] = useState<UpdateStatus | null>(null)
+  const [updateDismissed, setUpdateDismissed] = useState(false)
+  const [updateBusy, setUpdateBusy] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -67,6 +74,32 @@ export default function App() {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    // Update check is independent of settings loading; fail silently.
+    fetchUpdateStatus()
+      .then((result) => {
+        if (!cancelled) setUpdate(result)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  async function handleSkipUpdate() {
+    if (!update?.latestVersion) return
+    setUpdateBusy(true)
+    try {
+      const result = await skipUpdateVersion(update.latestVersion)
+      setUpdate(result)
+    } catch {
+      // Keep the banner; the skip simply didn't take.
+    } finally {
+      setUpdateBusy(false)
+    }
+  }
 
   useEffect(() => {
     if (info?.paths.settings) {
@@ -282,6 +315,14 @@ export default function App() {
 
   return (
     <div className="shell">
+      {update?.updateAvailable && !updateDismissed && (
+        <UpdateBanner
+          status={update}
+          busy={updateBusy}
+          onSkip={handleSkipUpdate}
+          onDismiss={() => setUpdateDismissed(true)}
+        />
+      )}
       <header className="hero">
         <div className="hero__copy">
           <p className="eyebrow">PalKnobs</p>
